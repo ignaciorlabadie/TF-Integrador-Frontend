@@ -1,13 +1,24 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import Home from './pages/Home'
-import Login from './pages/Login'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { LoginPage } from './pages/LoginPage'
+import { InicioPage } from './pages/InicioPage'
+
+function RutaProtegida() {
+    const token = localStorage.getItem('token')
+
+    if (!token) {
+        return <Navigate to="/login" replace />
+    }
+
+    return <InicioPage />
+}
 
 function App() {
     return (
         <BrowserRouter>
             <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/login" element={<Login />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/" element={<RutaProtegida />} />
+                <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
         </BrowserRouter>
     )
