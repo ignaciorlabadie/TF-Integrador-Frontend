@@ -21,3 +21,22 @@ export async function obtenerPerfil(): Promise<Usuario> {
     const respuesta = await api.get<Usuario>('/auth/me')
     return respuesta.data
 }
+
+export function cerrarSesion() {
+    localStorage.removeItem('token')
+    localStorage.removeItem('usuario')
+}
+
+export function obtenerUsuarioGuardado(): Usuario | null {
+    const guardado = localStorage.getItem('usuario')
+
+    if (!guardado) {
+        return null
+    }
+
+    try {
+        return JSON.parse(guardado) as Usuario
+    } catch {
+        return null
+    }
+}
