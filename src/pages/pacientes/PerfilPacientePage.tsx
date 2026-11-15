@@ -4,6 +4,7 @@ import {
     modificarMiPerfil,
 } from '../../services/pacienteService'
 import type { Paciente } from '../../types/paciente'
+import { Link } from 'react-router-dom'
 
 export default function PerfilPacientePage() {
     const [paciente, setPaciente] = useState<Paciente | null>(null)
@@ -164,6 +165,9 @@ export default function PerfilPacientePage() {
 
                 {mensaje && <p>{mensaje}</p>}
             </form>
+             <p>
+                <Link to="/estudios">Ver mis estudios</Link>
+            </p>
         </main>
     )
 }

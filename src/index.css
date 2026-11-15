@@ -220,3 +220,63 @@ th {
         color: #4ade80;
     }
 }
+
+.datos-estudio {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 8px 16px;
+    margin: 16px 0;
+    text-align: left;
+}
+
+.datos-estudio dt {
+    color: var(--text-h);
+    font-weight: 600;
+}
+
+.datos-estudio dd {
+    margin: 0;
+}
+
+.seccion-estudio {
+    margin-top: 32px;
+    text-align: left;
+}
+
+.seccion-estudio h2 {
+    margin-bottom: 12px;
+}
+
+.seccion-estudio p {
+    margin-bottom: 8px;
+}
+
+.archivo-acciones {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin: 12px 0;
+}
+
+.estado-autorizacion {
+    font-weight: 600;
+}
+
+.estado-disponible {
+    color: #15803d;
+}
+
+.estado-vencido {
+    color: #b91c1c;
+}
+
+@media (prefers-color-scheme: dark) {
+    .estado-disponible {
+        color: #4ade80;
+    }
+
+    .estado-vencido {
+        color: #f87171;
+    }
+}

@@ -1,32 +1,39 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import {
-    modificarPaciente,
-    obtenerPacientePorId,
-} from '../../services/pacienteService'
-import type { Paciente } from '../../types/paciente'
+    actualizarArchivoEstudio,
+    obtenerEstudioPorId,
+    obtenerUrlArchivo,
+} from '../../services/estudioService'
+import type { Estudio } from '../../types/estudio'
+import {
+    ACEPTAR_ARCHIVO_ESTUDIO,
+    validarArchivoEstudio,
+} from '../../utils/archivos'
 import { obtenerMensajeError } from '../../utils/errores'
 
-export function DetallePacientePage() {
+export function DetalleEstudioPage() {
     const { id } = useParams()
-    const pacienteId = Number(id)
+    const estudioId = Number(id)
 
-    const [paciente, setPaciente] = useState<Paciente | null>(null)
+    const [estudio, setEstudio] = useState<Estudio | null>(null)
+    const [archivo, setArchivo] = useState<File | null>(null)
     const [error, setError] = useState('')
     const [mensaje, setMensaje] = useState('')
     const [cargando, setCargando] = useState(true)
     const [guardando, setGuardando] = useState(false)
+    const [abriendo, setAbriendo] = useState(false)
 
     useEffect(() => {
-        async function cargarPaciente() {
+        async function cargarEstudio() {
             try {
-                const datos = await obtenerPacientePorId(pacienteId)
-                setPaciente(datos)
+                const datos = await obtenerEstudioPorId(estudioId)
+                setEstudio(datos)
             } catch (error) {
                 setError(
                     obtenerMensajeError(
                         error,
-                        'No se pudo cargar el paciente.',
+                        'No se pudo cargar el estudio.',
                     ),
                 )
             } finally {
@@ -34,35 +41,87 @@ export function DetallePacientePage() {
             }
         }
 
-        cargarPaciente()
-    }, [pacienteId])
+        cargarEstudio()
+    }, [estudioId])
 
-    async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-        event.preventDefault()
-
-        if (!paciente) return
-
+    function handleArchivoChange(event: React.ChangeEvent<HTMLInputElement>) {
+        const seleccionado = event.target.files?.[0] ?? null
         setError('')
         setMensaje('')
-        setGuardando(true)
+
+        if (seleccionado) {
+            const errorArchivo = validarArchivoEstudio(seleccionado)
+
+            if (errorArchivo) {
+                setError(errorArchivo)
+                event.target.value = ''
+                setArchivo(null)
+                return
+            }
+        }
+
+        setArchivo(seleccionado)
+    }
+
+    async function handleAbrirArchivo() {
+        if (!estudio?.archivoURL) return
+
+        setError('')
+        setAbriendo(true)
 
         try {
-            const actualizado = await modificarPaciente(paciente.id, {
-                nombre: paciente.nombre,
-                apellido: paciente.apellido,
-                dni: paciente.dni,
-                telefono: paciente.telefono,
-                fechaNacimiento: paciente.fechaNacimiento,
-                direccion: paciente.direccion,
-            })
-
-            setPaciente(actualizado)
-            setMensaje('Paciente actualizado correctamente.')
+            const { url } = await obtenerUrlArchivo(estudio.id)
+            window.open(url, '_blank', 'noopener,noreferrer')
         } catch (error) {
             setError(
                 obtenerMensajeError(
                     error,
-                    'No se pudo actualizar el paciente.',
+                    'No se pudo abrir el archivo.',
+                ),
+            )
+        } finally {
+            setAbriendo(false)
+        }
+    }
+
+    async function handleReemplazarArchivo(
+        event: React.FormEvent<HTMLFormElement>,
+    ) {
+        event.preventDefault()
+
+        if (!estudio) return
+
+        setError('')
+        setMensaje('')
+
+        if (!archivo) {
+            setError('Seleccioná un archivo para reemplazar.')
+            return
+        }
+
+        const errorArchivo = validarArchivoEstudio(archivo)
+
+        if (errorArchivo) {
+            setError(errorArchivo)
+            return
+        }
+
+        setGuardando(true)
+
+        try {
+            const actualizado = await actualizarArchivoEstudio(
+                estudio.id,
+                archivo,
+            )
+
+            setEstudio({ ...estudio, archivoURL: actualizado.archivoURL })
+            setArchivo(null)
+            setMensaje('Archivo actualizado correctamente.')
+        } catch (error) {
+            setError(
+                obtenerMensajeError(
+                    error,
+                    'No se pudo actualizar el archivo.',
                 ),
             )
         } finally {
@@ -71,15 +130,15 @@ export function DetallePacientePage() {
     }
 
     if (cargando) {
-        return <p>Cargando paciente...</p>
+        return <p>Cargando estudio...</p>
     }
 
-    if (!paciente) {
+    if (!estudio) {
         return (
             <main>
                 <p className="mensaje-error">{error}</p>
                 <p>
-                    <Link to="/pacientes">Volver a pacientes</Link>
+                    <Link to="/estudios">Volver a estudios</Link>
                 </p>
             </main>
         )
@@ -87,124 +146,125 @@ export function DetallePacientePage() {
 
     return (
         <main>
-            <h1>Paciente {paciente.id}</h1>
+            <h1>Estudio {estudio.id}</h1>
 
-            <p>Email: {paciente.usuario?.email ?? '-'}</p>
+            <dl className="datos-estudio">
+                <dt>Paciente</dt>
+                <dd>
+                    {estudio.paciente
+                        ? `${estudio.paciente.apellido}, ${estudio.paciente.nombre} (DNI ${estudio.paciente.dni})`
+                        : `#${estudio.pacienteId}`}
+                </dd>
 
-            <form onSubmit={handleSubmit}>
-                <label>
-                    Nombre
-                    <input
-                        value={paciente.nombre}
-                        onChange={(event) =>
-                            setPaciente({
-                                ...paciente,
-                                nombre: event.target.value,
-                            })
-                        }
-                        required
-                        minLength={2}
-                        maxLength={100}
-                    />
-                </label>
+                <dt>Tipo</dt>
+                <dd>{estudio.tipo}</dd>
 
-                <label>
-                    Apellido
-                    <input
-                        value={paciente.apellido}
-                        onChange={(event) =>
-                            setPaciente({
-                                ...paciente,
-                                apellido: event.target.value,
-                            })
-                        }
-                        required
-                        minLength={2}
-                        maxLength={100}
-                    />
-                </label>
+                <dt>Fecha</dt>
+                <dd>{estudio.fecha}</dd>
 
-                <label>
-                    DNI
-                    <input
-                        value={paciente.dni}
-                        onChange={(event) =>
-                            setPaciente({
-                                ...paciente,
-                                dni: event.target.value,
-                            })
-                        }
-                        inputMode="numeric"
-                        pattern="[0-9]{7,8}"
-                        maxLength={8}
-                        required
-                    />
-                </label>
+                <dt>Descripción</dt>
+                <dd>{estudio.descripcion}</dd>
+            </dl>
 
-                <label>
-                    Teléfono
-                    <input
-                        type="tel"
-                        value={paciente.telefono}
-                        onChange={(event) =>
-                            setPaciente({
-                                ...paciente,
-                                telefono: event.target.value,
-                            })
-                        }
-                        pattern="[+]?[0-9]{6,25}"
-                        maxLength={26}
-                        required
-                    />
-                </label>
+            <section className="seccion-estudio">
+                <h2>Archivo</h2>
 
-                <label>
-                    Fecha de nacimiento
-                    <input
-                        type="date"
-                        value={paciente.fechaNacimiento}
-                        onChange={(event) =>
-                            setPaciente({
-                                ...paciente,
-                                fechaNacimiento: event.target.value,
-                            })
-                        }
-                        max={new Date().toISOString().slice(0, 10)}
-                        required
-                    />
-                </label>
+                {estudio.archivoURL ? (
+                    <>
+                        <p>El estudio tiene un archivo adjunto.</p>
 
-                <label>
-                    Dirección
-                    <input
-                        value={paciente.direccion}
-                        onChange={(event) =>
-                            setPaciente({
-                                ...paciente,
-                                direccion: event.target.value,
-                            })
-                        }
-                        required
-                        minLength={3}
-                        maxLength={150}
-                    />
-                </label>
-
-                {error && (
-                    <p role="alert" className="mensaje-error">
-                        {error}
-                    </p>
+                        <div className="archivo-acciones">
+                            <button
+                                type="button"
+                                onClick={handleAbrirArchivo}
+                                disabled={abriendo}
+                            >
+                                {abriendo
+                                    ? 'Abriendo...'
+                                    : 'Abrir archivo'}
+                            </button>
+                        </div>
+                    </>
+                ) : (
+                    <p>Sin archivo adjunto.</p>
                 )}
 
-                {mensaje && <p className="mensaje-exito">{mensaje}</p>}
+                <form onSubmit={handleReemplazarArchivo}>
+                    <label>
+                        Reemplazar archivo
+                        <input
+                            type="file"
+                            accept={ACEPTAR_ARCHIVO_ESTUDIO}
+                            onChange={handleArchivoChange}
+                        />
+                    </label>
 
-                <button type="submit" disabled={guardando}>
-                    {guardando ? 'Guardando...' : 'Guardar cambios'}
-                </button>
-            </form>
+                    {error && (
+                        <p role="alert" className="mensaje-error">
+                            {error}
+                        </p>
+                    )}
+
+                    {mensaje && (
+                        <p className="mensaje-exito">{mensaje}</p>
+                    )}
+
+                    <button type="submit" disabled={guardando || !archivo}>
+                        {guardando ? 'Subiendo...' : 'Reemplazar archivo'}
+                    </button>
+                </form>
+            </section>
+
+            <section className="seccion-estudio">
+                <h2>Autorizaciones</h2>
+
+                {estudio.autorizaciones?.length ? (
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Profesional</th>
+                                <th>Especialidad</th>
+                                <th>Desde</th>
+                                <th>Hasta</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {estudio.autorizaciones.map((autorizacion) => (
+                                <tr key={autorizacion.id}>
+                                    <td>
+                                        {autorizacion.profesional
+                                            ? `${autorizacion.profesional.apellido}, ${autorizacion.profesional.nombre}`
+                                            : `#${autorizacion.profesionalId}`}
+                                    </td>
+                                    <td>
+                                        {autorizacion.profesional
+                                            ?.especialidad ?? '-'}
+                                    </td>
+                                    <td>{autorizacion.fechaAutorizacion}</td>
+                                    <td>{autorizacion.fechaVencimiento}</td>
+                                    <td
+                                        className={`estado-autorizacion ${
+                                            autorizacion.estado ===
+                                            'DISPONIBLE'
+                                                ? 'estado-disponible'
+                                                : 'estado-vencido'
+                                        }`}
+                                    >
+                                        {autorizacion.estado}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                ) : (
+                    <p>Sin autorizaciones registradas.</p>
+                )}
+            </section>
 
             <p>
-                <Link to="/pacientes">Volver a pacientes</Link>
+                <Link to="/estudios">Volver a estudios</Link>
             </p>
         </main>
     )
