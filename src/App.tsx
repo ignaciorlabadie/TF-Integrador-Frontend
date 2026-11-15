@@ -14,6 +14,9 @@ import { CrearUsuarioPage } from './pages/usuarios/CrearUsuarioPage'
 import { DetalleUsuarioPage } from './pages/usuarios/DetalleUsuarioPage'
 import { PacientesPage } from './pages/pacientes/PacientesPage'
 import { DetallePacientePage } from './pages/pacientes/DetallePacientePage'
+import { EstudiosPage } from './pages/estudios/EstudiosPage'
+import { CrearEstudioPage } from './pages/estudios/CrearEstudioPage'
+import { DetalleEstudioPage } from './pages/estudios/DetalleEstudioPage'
 
 function App() {
     return (
@@ -89,6 +92,35 @@ function App() {
                         element={
                             <RutaPorRol roles={['ADMIN']}>
                                 <DetallePacientePage />
+                            </RutaPorRol>
+                        }
+                    />
+
+                    <Route
+                        path="estudios"
+                        element={
+                            <RutaPorRol
+                                roles={['ADMIN', 'PROFESIONAL', 'PACIENTE']}
+                            >
+                                <EstudiosPage />
+                            </RutaPorRol>
+                        }
+                    />
+
+                    <Route
+                        path="estudios/nuevo"
+                        element={
+                            <RutaPorRol roles={['ADMIN']}>
+                                <CrearEstudioPage />
+                            </RutaPorRol>
+                        }
+                    />
+
+                    <Route
+                        path="estudios/:id"
+                        element={
+                            <RutaPorRol roles={['ADMIN', 'PROFESIONAL']}>
+                                <DetalleEstudioPage />
                             </RutaPorRol>
                         }
                     />

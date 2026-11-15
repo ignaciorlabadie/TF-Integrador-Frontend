@@ -22,6 +22,8 @@ export function Layout() {
 
                     <Link to="/mi-cuenta">Mi cuenta</Link>
 
+                    <Link to="/estudios">Estudios</Link>
+
                     {usuario?.rol === 'ADMIN' && (
                         <>
                             <Link to="/usuarios">Usuarios</Link>
