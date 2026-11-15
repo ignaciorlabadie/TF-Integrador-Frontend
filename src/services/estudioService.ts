@@ -53,9 +53,7 @@ export async function actualizarArchivoEstudio(
     return respuesta.data
 }
 
-export async function obtenerUrlArchivo(
-    id: number,
-): Promise<RespuestaArchivo> {
+export async function obtenerUrlArchivo(id: number): Promise<RespuestaArchivo> {
     const respuesta = await api.get<RespuestaArchivo>(`/estudios/${id}/archivo`)
     return respuesta.data
 }

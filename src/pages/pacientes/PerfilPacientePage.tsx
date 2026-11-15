@@ -165,7 +165,7 @@ export default function PerfilPacientePage() {
 
                 {mensaje && <p>{mensaje}</p>}
             </form>
-             <p>
+            <p>
                 <Link to="/estudios">Ver mis estudios</Link>
             </p>
         </main>

@@ -31,10 +31,7 @@ export function DetalleEstudioPage() {
                 setEstudio(datos)
             } catch (error) {
                 setError(
-                    obtenerMensajeError(
-                        error,
-                        'No se pudo cargar el estudio.',
-                    ),
+                    obtenerMensajeError(error, 'No se pudo cargar el estudio.'),
                 )
             } finally {
                 setCargando(false)
@@ -73,12 +70,7 @@ export function DetalleEstudioPage() {
             const { url } = await obtenerUrlArchivo(estudio.id)
             window.open(url, '_blank', 'noopener,noreferrer')
         } catch (error) {
-            setError(
-                obtenerMensajeError(
-                    error,
-                    'No se pudo abrir el archivo.',
-                ),
-            )
+            setError(obtenerMensajeError(error, 'No se pudo abrir el archivo.'))
         } finally {
             setAbriendo(false)
         }
@@ -119,10 +111,7 @@ export function DetalleEstudioPage() {
             setMensaje('Archivo actualizado correctamente.')
         } catch (error) {
             setError(
-                obtenerMensajeError(
-                    error,
-                    'No se pudo actualizar el archivo.',
-                ),
+                obtenerMensajeError(error, 'No se pudo actualizar el archivo.'),
             )
         } finally {
             setGuardando(false)
@@ -179,9 +168,7 @@ export function DetalleEstudioPage() {
                                 onClick={handleAbrirArchivo}
                                 disabled={abriendo}
                             >
-                                {abriendo
-                                    ? 'Abriendo...'
-                                    : 'Abrir archivo'}
+                                {abriendo ? 'Abriendo...' : 'Abrir archivo'}
                             </button>
                         </div>
                     </>
@@ -205,9 +192,7 @@ export function DetalleEstudioPage() {
                         </p>
                     )}
 
-                    {mensaje && (
-                        <p className="mensaje-exito">{mensaje}</p>
-                    )}
+                    {mensaje && <p className="mensaje-exito">{mensaje}</p>}
 
                     <button type="submit" disabled={guardando || !archivo}>
                         {guardando ? 'Subiendo...' : 'Reemplazar archivo'}
@@ -246,8 +231,7 @@ export function DetalleEstudioPage() {
                                     <td>{autorizacion.fechaVencimiento}</td>
                                     <td
                                         className={`estado-autorizacion ${
-                                            autorizacion.estado ===
-                                            'DISPONIBLE'
+                                            autorizacion.estado === 'DISPONIBLE'
                                                 ? 'estado-disponible'
                                                 : 'estado-vencido'
                                         }`}

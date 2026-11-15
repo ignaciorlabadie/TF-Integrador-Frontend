@@ -83,12 +83,7 @@ export function CrearEstudioPage() {
 
             navigate(`/estudios/${creado.id}`)
         } catch (error) {
-            setError(
-                obtenerMensajeError(
-                    error,
-                    'No se pudo crear el estudio.',
-                ),
-            )
+            setError(obtenerMensajeError(error, 'No se pudo crear el estudio.'))
         } finally {
             setCargando(false)
         }
@@ -103,9 +98,7 @@ export function CrearEstudioPage() {
                     Paciente
                     <select
                         value={pacienteId}
-                        onChange={(event) =>
-                            setPacienteId(event.target.value)
-                        }
+                        onChange={(event) => setPacienteId(event.target.value)}
                         required
                     >
                         <option value="">Seleccioná un paciente</option>
@@ -143,9 +136,7 @@ export function CrearEstudioPage() {
                     Descripción
                     <textarea
                         value={descripcion}
-                        onChange={(event) =>
-                            setDescripcion(event.target.value)
-                        }
+                        onChange={(event) => setDescripcion(event.target.value)}
                         rows={4}
                         required
                     />

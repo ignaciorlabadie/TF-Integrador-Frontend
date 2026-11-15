@@ -80,10 +80,7 @@ export function EstudiosPage() {
         const mapa = new Map<number, string>()
 
         for (const paciente of pacientes) {
-            mapa.set(
-                paciente.id,
-                `${paciente.apellido}, ${paciente.nombre}`,
-            )
+            mapa.set(paciente.id, `${paciente.apellido}, ${paciente.nombre}`)
         }
 
         return mapa
@@ -149,13 +146,8 @@ export function EstudiosPage() {
             {esAdmin && pacienteIdFiltro && (
                 <p>
                     Mostrando estudios del paciente{' '}
-                    {nombrePacienteFiltro ??
-                        `#${pacienteIdFiltro}`}
-                    .{' '}
-                    <button
-                        type="button"
-                        onClick={() => setSearchParams({})}
-                    >
+                    {nombrePacienteFiltro ?? `#${pacienteIdFiltro}`}.{' '}
+                    <button type="button" onClick={() => setSearchParams({})}>
                         Quitar filtro
                     </button>
                 </p>
@@ -180,7 +172,7 @@ export function EstudiosPage() {
                         onChange={(event) => {
                             setBusqueda(event.target.value)
                             setPaginaActual(1)
-                            }}
+                        }}
                     />
                 </div>
             )}
@@ -225,9 +217,7 @@ export function EstudiosPage() {
                                     <td>{estudio.tipo}</td>
                                     <td>{estudio.fecha}</td>
                                     <td>{estudio.descripcion}</td>
-                                    <td>
-                                        {estudio.archivoURL ? 'Sí' : 'No'}
-                                    </td>
+                                    <td>{estudio.archivoURL ? 'Sí' : 'No'}</td>
 
                                     {esPaciente && (
                                         <td>

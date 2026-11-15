@@ -19,4 +19,3 @@ export function validarArchivoEstudio(archivo: File): string | null {
 
     return null
 }
-
