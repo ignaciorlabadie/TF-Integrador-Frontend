@@ -3,7 +3,7 @@ import { cleanup } from '@testing-library/react'
 import { afterAll, afterEach, beforeAll, vi } from 'vitest'
 import { server } from './test/mocks/server'
 
-vi.stubEnv('VITE_API_URL', 'http://localhost:3000')
+vi.stubEnv('VITE_API_URL', 'http://localhost:3000/api')
 
 beforeAll(() => {
     server.listen()

@@ -10,7 +10,7 @@ export default defineConfig({
         setupFiles: './src/setupTests.ts',
         css: true,
         env: {
-            VITE_API_URL: 'http://localhost:3000',
+            VITE_API_URL: 'http://localhost:3000/api',
         },
         coverage: {
             provider: 'v8',
